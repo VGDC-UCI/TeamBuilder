@@ -1,3 +1,7 @@
+from collections import defaultdict
+
+needed = {"Artist" : 2, "Gameplay Designer" : 2, "Audio Designer" : 1, "Producer" : 1, "Programmer" : 3, "Writer" : 1}
+
 #all priority lists highest -> lowest
 
 class App():
@@ -6,8 +10,11 @@ class App():
         self.name = name
         self.rolls = rolls
         self.exps = dict(zip(rolls,exps))
-        self.pref_names = []
+        self.pref_names = pref_names
         self.prefs = []
+
+    def serialize(self, sep_char):
+        return sep_char.join([self.name]+ [ roll + sep_char + self.exps[roll] for roll in self.rolls ] + self.pref_names)
 
     def _get_pref(self, team):
         if team.name in self.pref_names:
@@ -25,7 +32,7 @@ class App():
         self.prefs.remove(team)
 
     def done(self):
-        return len(self.prefs)
+        return not len(self.prefs)
 
 class Team():
 
@@ -40,22 +47,25 @@ class Team():
         self.spaces = spaces
         self.members = []
         if product:
-            self._get_pref = Team._product_get_pref
+            self._get_pref = self._product_get_pref
+
+    def serialize(self, sep_char):
+        return sep_char.join([self.name]+self.rolls)
 
     def _get_pref(self, app):
-        roll_unneeded = ( not roll in self.rolls for roll in app.rolls )
-        have_roll = ( self.roll_counts[roll] for roll in app.roll )
-        exps = ( app.exps[roll] for roll in app.rolls ) #favor inexperianced membrs
-        have_exp = ( self.exp_counts[exp] for exp in exps )
+        roll_unneeded = [ not roll in self.rolls for roll in app.rolls ]
+        have_roll = [ self.roll_counts[roll] - needed[roll] for roll in app.rolls ]
+        exps = [ app.exps[roll] for roll in app.rolls ] #favor inexperianced membrs
+        have_exp = [ self.exp_counts[exp] for exp in exps ]
         return (roll_unneeded, have_roll, have_exp, exps)
 
     def _product_get_pref(self, app):
         default = Team._get_pref(self, app)
-        return (default[0], default[1], (-1* e for e in default[3]))
+        return (default[0], default[1], [-1* e for e in default[3]])
 
     def _account(self, app, co = 1):
-        bool primary = True
-        for roll in app.rolls
+        primary = True
+        for roll in app.rolls:
             v = co*(1 if primary else 0.3)
             self.roll_counts[roll] += v
             self.exp_counts[app.exps[roll]] += v
@@ -66,7 +76,7 @@ class Team():
         self._account(app)
         self.members.append(app)
         self.members.sort(key=self._get_pref)
-        if self.size < 0:
+        if self.spaces < 0:
             reject = self.members.pop(-1)
             self._account(reject, -1)
             return reject
