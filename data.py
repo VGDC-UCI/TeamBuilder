@@ -115,9 +115,16 @@ class Team():
             return -1
         have_roll = [ max([self.roll_counts[roll] - needed[roll], -1]) + check_first(roll) for roll in app.rolls ] #priortizes members with fewer other people in their dept
         exps = [ app.exps[roll] for roll in app.rolls ] #favor inexperianced membrs
-        #passion = -1*len(app.prefs) #favor members who wanted to be on the team more
+        passion = 0
+        """
+        Comment the bellow list to recude number of first and last choice assignments
+        """
+        passion = -1*len(app.prefs) #favor members who wanted to be on the team more
         have_exp = [ self.exp_counts[exp] for exp in exps ] #favor members with a different level of experiance than other members
-        return (roll_unneeded, have_roll, have_exp, exps)
+        """
+        Change the bellow line to re-rank priorities (will need to change Product Get Pref accordingly)
+        """
+        return (roll_unneeded, passion, have_roll, have_exp, exps) 
 
     """
     An altered priority algorithm for product-oriented teams
@@ -125,7 +132,7 @@ class Team():
     """
     def _product_get_pref(self, app):
         default = Team._get_pref(self, app)
-        return (default[0], default[1], [-1* e for e in default[3]])
+        return (default[0], default[1], default[2], [-1* e for e in default[-1]])
 
     """
     A helper function that tracks the reprsentation of experiance levels and rolls
