@@ -12,7 +12,7 @@ with each choice in format:
 """
 def app(s):
     d = s.split(sep_char)
-    return data.App(d[0]+' '+d[1], d[2:3], d[4:5], [t.split('"')[1][:-1] for t in d[6:]])
+    return data.App(d[0]+' '+d[1], d[2:3] + d[4:5], d[3:4] + d[5:6], [t.split('"')[1][:-1] for t in d[6:]])
 
 """
 Parses a row of CSV into a Team object.

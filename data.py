@@ -54,8 +54,15 @@ class Team():
 
     def _get_pref(self, app):
         roll_unneeded = [ not roll in self.rolls for roll in app.rolls ]
-        have_roll = [ self.roll_counts[roll] - needed[roll] for roll in app.rolls ]
+        had_rolls = set()
+        def check_first(roll): #used to keep atleast one member of an overcrowed dept
+            if roll in had_rolls:
+                return 0
+            had_rolls.add(roll)
+            return -1
+        have_roll = [ max([self.roll_counts[roll] - needed[roll], -1]) + check_first(roll) for roll in app.rolls ]
         exps = [ app.exps[roll] for roll in app.rolls ] #favor inexperianced membrs
+        #passion = -1*len(app.prefs)
         have_exp = [ self.exp_counts[exp] for exp in exps ]
         return (roll_unneeded, have_roll, have_exp, exps)
 
