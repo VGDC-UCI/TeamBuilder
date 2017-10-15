@@ -16,10 +16,8 @@ if __name__ == "__main__":
     with open(out_file, 'w') as f:
         sep_char = ","
         for team in teams:
-            #f.write("==\t"+team.Data_read_from)
             f.write("'=="+sep_char+team.serialize(sep_char)+'\n')
             for member in team.members:
-                #f.write(team.name+"\t"+member.Data_read_from)
                 f.write(team.name + sep_char + member.serialize(sep_char)+'\n')
         f.write("'=="+sep_char+"Teamless\n")
         for reject in rejects:

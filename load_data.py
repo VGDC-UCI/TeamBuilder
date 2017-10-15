@@ -27,6 +27,11 @@ def team(s):
     rolls = d[0].split(', ')
     return data.Team(d[1], rolls, sum(data.needed[roll] for roll in rolls), d[2]=="Product-oriented")
 
+"""
+Loads a file into a list of objects
+Takes the path of the file and a parser function
+that parser should take a life of the file as a string and return an object of the designered type
+"""
 def load_file(file, parse):
     r = []
     with open(file) as f:
